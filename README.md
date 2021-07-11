@@ -1,4 +1,4 @@
 # bytehonor-okhttp-sdk
-bytehonor-okhttp-sdk
+bytehonor-http-sdk
 
-okhttp4
+apache http
