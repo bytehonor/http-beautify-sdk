@@ -1,0 +1,38 @@
+plugins {
+	id 'java-library'
+}
+
+apply from: 'repository.gradle'
+
+group = 'com.bytehonor.sdk'
+version = '0.1.0'
+sourceCompatibility = 1.8
+
+[compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+
+configurations {
+	developmentOnly
+	runtimeClasspath {
+		extendsFrom developmentOnly
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+
+dependencies {
+    api('org.apache.httpcomponents:httpclient:4.5.13')
+    api("org.apache.httpcomponents:httpmime:4.5.13")
+	implementation('org.slf4j:slf4j-api:1.7.30')
+	testImplementation('ch.qos.logback:logback-classic:1.2.3')
+	testImplementation('junit:junit:4.12')
+}
+
+jar {
+    manifest {
+        attributes('Implementation-Title': project.name,
+                   'Implementation-Version': project.version)
+    }
+}
