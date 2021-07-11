@@ -83,8 +83,8 @@ public class BytehonorHttpClient {
         // 加个共享连接池
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(
                 socketFactoryRegistry);
-        connectionManager.setMaxTotal(100);
-        connectionManager.setDefaultMaxPerRoute(20);
+        connectionManager.setMaxTotal(200);
+        connectionManager.setDefaultMaxPerRoute(50);
         httpClient = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig)
                 .setConnectionManager(connectionManager).setConnectionManagerShared(true).build();
     }
