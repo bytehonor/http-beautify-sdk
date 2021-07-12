@@ -3,8 +3,6 @@ package com.bytehonor.sdk.http.bytehonor.client;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -16,7 +14,7 @@ public class BytehonorHttpClientTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(BytehonorHttpClientTest.class);
 
-    @Test
+//    @Test
     public void testGetString2() {
         boolean isOk = true;
         try {
@@ -31,24 +29,20 @@ public class BytehonorHttpClientTest {
         assertTrue("*testStartThread*", isOk);
     }
 
-//    @Test
-    public void testUpload() {
-        String url = "xx";
-
+    @Test
+    public void testDownload() {
+        String url = "https://bytehonor-vpn.oss-us-west-1.aliyuncs.com/v1/twitter/1382943097454088192/d6abb9692b553381fd4c0688d5ce99c2.jpg";
+        String path = "/Users/lijianqiang/data/testDownload.jpg";
         boolean isOk = true;
-        File file = null;
         try {
-            file = new File("/xxx/1.jpg");
-            Map<String, String> paramsMap = new HashMap<String, String>();
-            paramsMap.put("status", "xx");
-            paramsMap.put("access_token", "xx");
-
-            String res = BytehonorHttpClient.uploadPic(url, paramsMap, file);
-            LOG.info("res:{}", res);
+            BytehonorHttpClient.download(url, path);
+            File file = new File(path);
+            isOk = file.exists();
+            LOG.info("isOk:{}", isOk);
         } catch (Exception e) {
             isOk = false;
-            LOG.error("testUpload", e);
+            LOG.error("testDownload", e);
         }
-        assertTrue("testUpload", isOk);
+        assertTrue("testDownload", isOk);
     }
 }

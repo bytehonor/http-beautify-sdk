@@ -1,7 +1,9 @@
 package com.bytehonor.sdk.http.bytehonor.client;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -10,6 +12,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
 import org.apache.http.client.config.RequestConfig;
@@ -56,6 +60,8 @@ public class BytehonorHttpClient {
     private static final int CONNECT_POOL_MAX_TOTAL = 512;
 
     private static final int CONNECT_POOL_MAX_PER_ROUTE = 128;
+
+    private static final int CACHE = 1024;
 
     private static final String USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4535.3 Safari/537.36";
 
@@ -323,5 +329,38 @@ public class BytehonorHttpClient {
 
 //        return execute(request);
         return null;
+    }
+
+    public static void download(String url, String filePath) {
+        Objects.requireNonNull(url, "url");
+        Objects.requireNonNull(filePath, "filePath");
+        try {
+            HttpGet request = new HttpGet(url);
+            request.addHeader("User-Agent", USER_AGENT);
+            HttpResponse response = getInstance().httpClient.execute(request);
+
+            HttpEntity entity = response.getEntity();
+            InputStream is = entity.getContent();
+
+            File file = new File(filePath);
+            file.getParentFile().mkdirs();
+            FileOutputStream fileout = new FileOutputStream(file);
+            /**
+             * 根据实际运行效果 设置缓冲区大小
+             */
+            byte[] buffer = new byte[CACHE];
+            int ch = 0;
+            while ((ch = is.read(buffer)) != -1) {
+                fileout.write(buffer, 0, ch);
+            }
+            is.close();
+            fileout.flush();
+            fileout.close();
+        } catch (Exception e) {
+            LOG.error("download url:{}", url, e);
+            throw new BytehonorHttpSdkException(e);
+        } finally {
+            close(null);
+        }
     }
 }
