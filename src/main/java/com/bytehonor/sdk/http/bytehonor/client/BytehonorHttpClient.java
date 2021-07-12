@@ -10,8 +10,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 
-import javax.net.ssl.SSLContext;
-
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
 import org.apache.http.client.config.RequestConfig;
@@ -20,17 +18,11 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,8 +39,9 @@ public class BytehonorHttpClient {
 
     /**
      * socket超时时间
+     * 
+     * private static final int SOCKET_TIMEOUT = 10 * 1000;
      */
-    private static final int SOCKET_TIMEOUT = 60 * 1000;
 
     /**
      * 连接请求超时时间
@@ -60,6 +53,10 @@ public class BytehonorHttpClient {
      */
     private static final int CONNECT_TIMEOUT = 10 * 1000;
 
+    private static final int CONNECT_POOL_MAX_TOTAL = 512;
+
+    private static final int CONNECT_POOL_MAX_PER_ROUTE = 128;
+
     private static final String USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4535.3 Safari/537.36";
 
     private CloseableHttpClient httpClient;
@@ -70,21 +67,22 @@ public class BytehonorHttpClient {
 
     private void init() {
         RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(CONNECTION_REQUEST_TIMEOUT)
-                .setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).build();
+                .setConnectTimeout(CONNECT_TIMEOUT).build();
 
         // https://blog.csdn.net/qq_28929589/article/details/88284723
-        SSLContext sslcontext = SSLContexts.createDefault();
-        SSLConnectionSocketFactory factory = new SSLConnectionSocketFactory(sslcontext, new String[] { "TLSv1.2" },
-                null, SSLConnectionSocketFactory.getDefaultHostnameVerifier());
-
-        Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
-                .register("http", PlainConnectionSocketFactory.getSocketFactory()).register("https", factory) // 用来配置支持的协议
-                .build();
-        // 加个共享连接池
-        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(
-                socketFactoryRegistry);
-        connectionManager.setMaxTotal(200);
-        connectionManager.setDefaultMaxPerRoute(50);
+//        SSLContext sslcontext = SSLContexts.createDefault();
+//        SSLConnectionSocketFactory factory = new SSLConnectionSocketFactory(sslcontext, new String[] { "TLSv1.2" },
+//                null, SSLConnectionSocketFactory.getDefaultHostnameVerifier());
+//
+//        Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
+//                .register("http", PlainConnectionSocketFactory.getSocketFactory()).register("https", factory) // 用来配置支持的协议
+//                .build();
+//        // 加个共享连接池
+//        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(
+//                socketFactoryRegistry);
+        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+        connectionManager.setMaxTotal(CONNECT_POOL_MAX_TOTAL);
+        connectionManager.setDefaultMaxPerRoute(CONNECT_POOL_MAX_PER_ROUTE);
         httpClient = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig)
                 .setConnectionManager(connectionManager).setConnectionManagerShared(true).build();
     }
