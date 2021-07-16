@@ -112,7 +112,9 @@ public class BytehonorHttpClient {
             StatusLine statusLine = response.getStatusLine();
             int statusCode = statusLine.getStatusCode();
             if (statusCode == 200) {
-                body = EntityUtils.toString(response.getEntity(), "UTF-8");
+                HttpEntity entity = response.getEntity();
+                body = EntityUtils.toString(entity, "UTF-8");
+                EntityUtils.consume(entity);
             } else {
                 LOG.error("statusCode:{}", statusCode);
                 LOG.error("reason:{}", statusLine.getReasonPhrase());
@@ -128,11 +130,11 @@ public class BytehonorHttpClient {
     }
 
     private static void close(CloseableHttpResponse response) {
-        try {
-            getInstance().httpClient.close();
-        } catch (IOException e1) {
-            LOG.error("httpClient close", e1);
-        }
+//        try {
+//            getInstance().httpClient.close();
+//        } catch (IOException e1) {
+//            LOG.error("httpClient close", e1);
+//        }
         if (response != null) {
             try {
                 response.close();
