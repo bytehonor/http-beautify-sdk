@@ -57,7 +57,7 @@ public class BytehonorHttpClient {
      */
     private static final int CONNECT_TIMEOUT = 10 * 1000;
 
-    private static final int CONNECT_POOL_MAX_TOTAL = 1024;
+    private static final int CONNECT_POOL_MAX_TOTAL = 1536;
 
     private static final int CONNECT_POOL_MAX_PER_ROUTE = 512;
 
@@ -89,6 +89,7 @@ public class BytehonorHttpClient {
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
         connectionManager.setMaxTotal(CONNECT_POOL_MAX_TOTAL);
         connectionManager.setDefaultMaxPerRoute(CONNECT_POOL_MAX_PER_ROUTE);
+        connectionManager.setValidateAfterInactivity(1000 * 300);
         httpClient = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig)
                 .setConnectionManager(connectionManager).setConnectionManagerShared(true).build();
     }
