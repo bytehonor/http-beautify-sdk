@@ -59,7 +59,7 @@ public class BytehonorHttpClient {
 
     private static final int CONNECT_POOL_MAX_TOTAL = 1024;
 
-    private static final int CONNECT_POOL_MAX_PER_ROUTE = 512;
+    private static final int CONNECT_POOL_MAX_PER_ROUTE = 1024;
 
     private static final int CACHE = 1024;
 
