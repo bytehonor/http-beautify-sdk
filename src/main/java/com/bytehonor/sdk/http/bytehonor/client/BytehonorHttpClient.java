@@ -72,26 +72,19 @@ public class BytehonorHttpClient {
     }
 
     private void init() {
+        httpClient = build();
+    }
+
+    public static CloseableHttpClient build() {
         RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(CONNECTION_REQUEST_TIMEOUT)
                 .setConnectTimeout(CONNECT_TIMEOUT).build();
-
         // https://blog.csdn.net/qq_28929589/article/details/88284723
-//        SSLContext sslcontext = SSLContexts.createDefault();
-//        SSLConnectionSocketFactory factory = new SSLConnectionSocketFactory(sslcontext, new String[] { "TLSv1.2" },
-//                null, SSLConnectionSocketFactory.getDefaultHostnameVerifier());
-//
-//        Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
-//                .register("http", PlainConnectionSocketFactory.getSocketFactory()).register("https", factory) // 用来配置支持的协议
-//                .build();
-//        // 加个共享连接池
-//        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(
-//                socketFactoryRegistry);
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
         connectionManager.setMaxTotal(CONNECT_POOL_MAX_TOTAL);
         connectionManager.setDefaultMaxPerRoute(CONNECT_POOL_MAX_PER_ROUTE);
         connectionManager.setValidateAfterInactivity(1000 * 300);
-        httpClient = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig)
-                .setConnectionManager(connectionManager).setConnectionManagerShared(true).build();
+        return HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).setConnectionManager(connectionManager)
+                .setConnectionManagerShared(true).build();
     }
 
     private static class LazzyHolder {
