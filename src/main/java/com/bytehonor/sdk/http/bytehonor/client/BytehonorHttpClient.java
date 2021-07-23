@@ -259,9 +259,24 @@ public class BytehonorHttpClient {
         Objects.requireNonNull(url, "url");
         Objects.requireNonNull(json, "json");
 
+        return postJson(url, json, null);
+    }
+
+    public static String postJson(String url, String json, Map<String, String> headerMap) {
+        Objects.requireNonNull(url, "url");
+        Objects.requireNonNull(json, "json");
+
         HttpPost request = new HttpPost(url);
         request.addHeader("Accept", "application/json");
         request.addHeader("Content-type", "application/json; charset=utf-8");
+        if (headerMap != null && headerMap.isEmpty() == false) {
+            for (Entry<String, String> item : headerMap.entrySet()) {
+                request.addHeader(item.getKey(), item.getValue());
+            }
+        } else {
+            request.addHeader("User-Agent", USER_AGENT);
+        }
+
         try {
             request.setEntity(new StringEntity(json, Charset.forName("UTF-8")));
         } catch (Exception e) {
@@ -275,8 +290,23 @@ public class BytehonorHttpClient {
         Objects.requireNonNull(url, "url");
         Objects.requireNonNull(xml, "xml");
 
+        return postXml(url, xml);
+    }
+
+    public static String postXml(String url, String xml, Map<String, String> headerMap) {
+        Objects.requireNonNull(url, "url");
+        Objects.requireNonNull(xml, "xml");
+
         HttpPost request = new HttpPost(url);
         request.addHeader("Content-Type", "application/xml; charset=utf-8");
+        if (headerMap != null && headerMap.isEmpty() == false) {
+            for (Entry<String, String> item : headerMap.entrySet()) {
+                request.addHeader(item.getKey(), item.getValue());
+            }
+        } else {
+            request.addHeader("User-Agent", USER_AGENT);
+        }
+
         try {
             request.setEntity(new StringEntity(xml, Charset.forName("UTF-8")));
         } catch (Exception e) {
