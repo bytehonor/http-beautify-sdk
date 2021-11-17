@@ -63,7 +63,7 @@ public class BytehonorHttpClient {
 
     private static final int CACHE = 1024;
 
-    private static final String USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4535.3 Safari/537.36";
+    private static final String USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36";
 
     private CloseableHttpClient httpClient;
 
@@ -110,8 +110,7 @@ public class BytehonorHttpClient {
                 body = EntityUtils.toString(entity, "UTF-8");
                 EntityUtils.consume(entity);
             } else {
-                LOG.error("statusCode:{}", statusCode);
-                LOG.error("reason:{}", statusLine.getReasonPhrase());
+                LOG.error("statusCode:{}, reason:{}", statusCode, statusLine.getReasonPhrase());
                 throw new BytehonorHttpSdkException(String.valueOf(statusCode));
             }
         } catch (Exception e) {
