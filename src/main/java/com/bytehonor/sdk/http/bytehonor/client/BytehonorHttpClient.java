@@ -188,12 +188,11 @@ public class BytehonorHttpClient {
         }
 
         HttpGet request = new HttpGet(url);
+        request.addHeader("User-Agent", USER_AGENT);
         if (headerMap != null && headerMap.isEmpty() == false) {
             for (Entry<String, String> item : headerMap.entrySet()) {
                 request.addHeader(item.getKey(), item.getValue());
             }
-        } else {
-            request.addHeader("User-Agent", USER_AGENT);
         }
 
         return execute(request);
@@ -225,12 +224,11 @@ public class BytehonorHttpClient {
         Objects.requireNonNull(url, "url");
 
         HttpPost request = new HttpPost(url);
+        request.addHeader("User-Agent", USER_AGENT);
         if (headerMap != null && headerMap.isEmpty() == false) {
             for (Entry<String, String> item : headerMap.entrySet()) {
                 request.addHeader(item.getKey(), item.getValue());
             }
-        } else {
-            request.addHeader("User-Agent", USER_AGENT);
         }
 
         List<NameValuePair> pairs = new ArrayList<NameValuePair>();
@@ -266,14 +264,13 @@ public class BytehonorHttpClient {
         Objects.requireNonNull(json, "json");
 
         HttpPost request = new HttpPost(url);
+        request.addHeader("User-Agent", USER_AGENT);
         request.addHeader("Accept", "application/json");
         request.addHeader("Content-type", "application/json; charset=utf-8");
         if (headerMap != null && headerMap.isEmpty() == false) {
             for (Entry<String, String> item : headerMap.entrySet()) {
                 request.addHeader(item.getKey(), item.getValue());
             }
-        } else {
-            request.addHeader("User-Agent", USER_AGENT);
         }
 
         try {
@@ -297,13 +294,12 @@ public class BytehonorHttpClient {
         Objects.requireNonNull(xml, "xml");
 
         HttpPost request = new HttpPost(url);
+        request.addHeader("User-Agent", USER_AGENT);
         request.addHeader("Content-Type", "application/xml; charset=utf-8");
         if (headerMap != null && headerMap.isEmpty() == false) {
             for (Entry<String, String> item : headerMap.entrySet()) {
                 request.addHeader(item.getKey(), item.getValue());
             }
-        } else {
-            request.addHeader("User-Agent", USER_AGENT);
         }
 
         try {
