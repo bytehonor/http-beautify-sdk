@@ -123,11 +123,6 @@ public class BytehonorHttpClient {
     }
 
     private static void close(CloseableHttpResponse response) {
-//        try {
-//            getInstance().httpClient.close();
-//        } catch (IOException e1) {
-//            LOG.error("httpClient close", e1);
-//        }
         if (response != null) {
             try {
                 response.close();
@@ -152,34 +147,34 @@ public class BytehonorHttpClient {
      * 传递参数的get请求。
      * 
      * @param url
-     * @param paramsMap
+     * @param params
      * @return
      * @throws BytehonorHttpSdkException
      */
-    public static String get(String url, Map<String, String> paramsMap) throws BytehonorHttpSdkException {
-        return get(url, paramsMap, null);
+    public static String get(String url, Map<String, String> params) throws BytehonorHttpSdkException {
+        return get(url, params, null);
     }
 
     /**
      * 传递参数，且传递请求头的get请求。
      * 
      * @param url
-     * @param paramsMap
-     * @param headerMap
+     * @param params
+     * @param headers
      * @return
      * @throws BytehonorHttpSdkException
      */
-    public static String get(String url, Map<String, String> paramsMap, Map<String, String> headerMap)
+    public static String get(String url, Map<String, String> params, Map<String, String> headers)
             throws BytehonorHttpSdkException {
         Objects.requireNonNull(url, "url");
-        if (paramsMap != null && paramsMap.isEmpty() == false) {
+        if (params != null && params.isEmpty() == false) {
             StringBuilder sb = new StringBuilder(url);
             if (url.indexOf('?') < 0) {
                 sb.append("?");
             } else {
                 sb.append("&");
             }
-            for (Entry<String, String> item : paramsMap.entrySet()) {
+            for (Entry<String, String> item : params.entrySet()) {
                 sb.append(item.getKey()).append("=").append(item.getValue());
                 sb.append("&");
             }
@@ -188,10 +183,10 @@ public class BytehonorHttpClient {
         }
 
         HttpGet request = new HttpGet(url);
-        request.addHeader("User-Agent", USER_AGENT);
-        if (headerMap != null && headerMap.isEmpty() == false) {
-            for (Entry<String, String> item : headerMap.entrySet()) {
-                request.addHeader(item.getKey(), item.getValue());
+        request.setHeader("User-Agent", USER_AGENT);
+        if (headers != null && headers.isEmpty() == false) {
+            for (Entry<String, String> item : headers.entrySet()) {
+                request.setHeader(item.getKey(), item.getValue());
             }
         }
 
@@ -202,38 +197,38 @@ public class BytehonorHttpClient {
      * 传递参数的postForm请求。
      * 
      * @param url
-     * @param paramsMap
+     * @param params
      * @return
      * @throws BytehonorHttpSdkException
      */
-    public static String postForm(String url, Map<String, String> paramsMap) throws BytehonorHttpSdkException {
-        return postForm(url, paramsMap, null);
+    public static String postForm(String url, Map<String, String> params) throws BytehonorHttpSdkException {
+        return postForm(url, params, null);
     }
 
     /**
      * 传递参数，且传递请求头的postForm请求。
      * 
      * @param url
-     * @param paramsMap
-     * @param headerMap
+     * @param params
+     * @param headers
      * @return
      * @throws BytehonorHttpSdkException
      */
-    public static String postForm(String url, Map<String, String> paramsMap, Map<String, String> headerMap)
+    public static String postForm(String url, Map<String, String> params, Map<String, String> headers)
             throws BytehonorHttpSdkException {
         Objects.requireNonNull(url, "url");
 
         HttpPost request = new HttpPost(url);
-        request.addHeader("User-Agent", USER_AGENT);
-        if (headerMap != null && headerMap.isEmpty() == false) {
-            for (Entry<String, String> item : headerMap.entrySet()) {
-                request.addHeader(item.getKey(), item.getValue());
+        request.setHeader("User-Agent", USER_AGENT);
+        if (headers != null && headers.isEmpty() == false) {
+            for (Entry<String, String> item : headers.entrySet()) {
+                request.setHeader(item.getKey(), item.getValue());
             }
         }
 
         List<NameValuePair> pairs = new ArrayList<NameValuePair>();
-        if (paramsMap != null && paramsMap.isEmpty() == false) {
-            for (Entry<String, String> item : paramsMap.entrySet()) {
+        if (params != null && params.isEmpty() == false) {
+            for (Entry<String, String> item : params.entrySet()) {
                 pairs.add(new BasicNameValuePair(item.getKey(), item.getValue()));
             }
         }
@@ -259,17 +254,17 @@ public class BytehonorHttpClient {
         return postJson(url, json, null);
     }
 
-    public static String postJson(String url, String json, Map<String, String> headerMap) {
+    public static String postJson(String url, String json, Map<String, String> headers) {
         Objects.requireNonNull(url, "url");
         Objects.requireNonNull(json, "json");
 
         HttpPost request = new HttpPost(url);
-        request.addHeader("User-Agent", USER_AGENT);
-        request.addHeader("Accept", "application/json");
-        request.addHeader("Content-type", "application/json; charset=utf-8");
-        if (headerMap != null && headerMap.isEmpty() == false) {
-            for (Entry<String, String> item : headerMap.entrySet()) {
-                request.addHeader(item.getKey(), item.getValue());
+        request.setHeader("User-Agent", USER_AGENT);
+        request.setHeader("Accept", "application/json");
+        request.setHeader("Content-type", "application/json; charset=utf-8");
+        if (headers != null && headers.isEmpty() == false) {
+            for (Entry<String, String> item : headers.entrySet()) {
+                request.setHeader(item.getKey(), item.getValue());
             }
         }
 
@@ -289,16 +284,16 @@ public class BytehonorHttpClient {
         return postXml(url, xml);
     }
 
-    public static String postXml(String url, String xml, Map<String, String> headerMap) {
+    public static String postXml(String url, String xml, Map<String, String> headers) {
         Objects.requireNonNull(url, "url");
         Objects.requireNonNull(xml, "xml");
 
         HttpPost request = new HttpPost(url);
-        request.addHeader("User-Agent", USER_AGENT);
-        request.addHeader("Content-Type", "application/xml; charset=utf-8");
-        if (headerMap != null && headerMap.isEmpty() == false) {
-            for (Entry<String, String> item : headerMap.entrySet()) {
-                request.addHeader(item.getKey(), item.getValue());
+        request.setHeader("User-Agent", USER_AGENT);
+        request.setHeader("Content-Type", "application/xml; charset=utf-8");
+        if (headers != null && headers.isEmpty() == false) {
+            for (Entry<String, String> item : headers.entrySet()) {
+                request.setHeader(item.getKey(), item.getValue());
             }
         }
 
@@ -311,24 +306,25 @@ public class BytehonorHttpClient {
         return execute(request);
     }
 
-    public static String uploadMedia(String url, Map<String, String> paramsMap, File file)
+    public static String uploadMedia(String url, Map<String, String> params, File file)
             throws BytehonorHttpSdkException {
-        return upload(url, paramsMap, file, "media");
+        return upload(url, params, file, "media");
     }
 
-    public static String uploadPic(String url, Map<String, String> paramsMap, File file)
-            throws BytehonorHttpSdkException {
-        return upload(url, paramsMap, file, "pic");
+    public static String uploadPic(String url, Map<String, String> params, File file) throws BytehonorHttpSdkException {
+        return upload(url, params, file, "pic");
     }
 
-    public static String uploadFile(String url, Map<String, String> paramsMap, File file)
+    public static String uploadFile(String url, Map<String, String> params, File file)
             throws BytehonorHttpSdkException {
-        return upload(url, paramsMap, file, "file");
+        return upload(url, params, file, "file");
     }
 
-    public static String upload(String url, Map<String, String> paramsMap, File file, String fileKey)
+    public static String upload(String url, Map<String, String> params, File file, String fileKey)
             throws BytehonorHttpSdkException {
         Objects.requireNonNull(url, "url");
+
+        throw new RuntimeException("TODO");
 //        MultipartBody.Builder multipartBuilder = new MultipartBody.Builder().setType(MultipartBody.FORM);
 //        if (file != null) {
 //            RequestBody fileBody = FormBody.create(file, MultipartBody.FORM);
@@ -337,8 +333,8 @@ public class BytehonorHttpClient {
 //            multipartBuilder.addFormDataPart("filelength", String.valueOf(file.length()));
 //        }
 //
-//        if (paramsMap != null && paramsMap.isEmpty() == false) {
-//            for (Entry<String, String> item : paramsMap.entrySet()) {
+//        if (params != null && params.isEmpty() == false) {
+//            for (Entry<String, String> item : params.entrySet()) {
 //                multipartBuilder.addFormDataPart(item.getKey(), item.getValue());
 //            }
 //        }
@@ -349,7 +345,6 @@ public class BytehonorHttpClient {
 //
 
 //        return execute(request);
-        return null;
     }
 
     public static void download(String url, String filePath) {
@@ -357,7 +352,7 @@ public class BytehonorHttpClient {
         Objects.requireNonNull(filePath, "filePath");
         try {
             HttpGet request = new HttpGet(url);
-            request.addHeader("User-Agent", USER_AGENT);
+            request.setHeader("User-Agent", USER_AGENT);
             HttpResponse response = getInstance().httpClient.execute(request);
 
             HttpEntity entity = response.getEntity();
