@@ -50,12 +50,12 @@ public class BytehonorHttpClient {
     /**
      * 连接请求超时时间
      */
-    private static final int CONNECTION_REQUEST_TIMEOUT = 5 * 1000;
+    private static final int CONNECTION_REQUEST_TIMEOUT = 10 * 1000;
 
     /**
      * 连接超时时间
      */
-    private static final int CONNECT_TIMEOUT = 5 * 1000;
+    private static final int CONNECT_TIMEOUT = 10 * 1000;
 
     private static final int CONNECT_POOL_MAX_TOTAL = 1024;
 
