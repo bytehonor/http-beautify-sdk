@@ -1,4 +1,4 @@
-# bytehonor-okhttp-sdk
-bytehonor-http-sdk
+# http-beautify-sdk
+http-beautify-sdk
 
 apache http

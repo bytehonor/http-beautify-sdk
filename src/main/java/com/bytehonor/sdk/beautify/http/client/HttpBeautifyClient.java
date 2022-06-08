@@ -1,4 +1,4 @@
-package com.bytehonor.sdk.http.bytehonor.client;
+package com.bytehonor.sdk.beautify.http.client;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,15 +31,15 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bytehonor.sdk.http.bytehonor.exception.BytehonorHttpSdkException;
+import com.bytehonor.sdk.beautify.http.exception.HttpBeautifyException;
 
 /**
  * @author lijianqiang
  *
  */
-public class BytehonorHttpClient {
+public class HttpBeautifyClient {
 
-    private static Logger LOG = LoggerFactory.getLogger(BytehonorHttpClient.class);
+    private static Logger LOG = LoggerFactory.getLogger(HttpBeautifyClient.class);
 
     /**
      * socket超时时间
@@ -67,7 +67,7 @@ public class BytehonorHttpClient {
 
     private CloseableHttpClient httpClient;
 
-    private BytehonorHttpClient() {
+    private HttpBeautifyClient() {
         this.init();
     }
 
@@ -88,16 +88,16 @@ public class BytehonorHttpClient {
     }
 
     private static class LazzyHolder {
-        private static BytehonorHttpClient INSTANCE = new BytehonorHttpClient();
+        private static HttpBeautifyClient INSTANCE = new HttpBeautifyClient();
     }
 
-    private static BytehonorHttpClient getInstance() {
+    private static HttpBeautifyClient getInstance() {
         return LazzyHolder.INSTANCE;
     }
 
     private static String execute(HttpUriRequest request) {
         if (getInstance().httpClient == null) {
-            throw new BytehonorHttpSdkException("httpClient not init");
+            throw new HttpBeautifyException("httpClient not init");
         }
         CloseableHttpResponse response = null;
         String body = "";
@@ -111,11 +111,11 @@ public class BytehonorHttpClient {
                 EntityUtils.consume(entity);
             } else {
                 LOG.error("statusCode:{}, reason:{}", statusCode, statusLine.getReasonPhrase());
-                throw new BytehonorHttpSdkException(String.valueOf(statusCode));
+                throw new HttpBeautifyException(String.valueOf(statusCode));
             }
         } catch (Exception e) {
             LOG.error("execute", e);
-            throw new BytehonorHttpSdkException(e);
+            throw new HttpBeautifyException(e);
         } finally {
             close(response);
         }
@@ -137,9 +137,9 @@ public class BytehonorHttpClient {
      * 
      * @param url
      * @return
-     * @throws BytehonorHttpSdkException
+     * @throws HttpBeautifyException
      */
-    public static String get(String url) throws BytehonorHttpSdkException {
+    public static String get(String url) throws HttpBeautifyException {
         return get(url, null, null);
     }
 
@@ -149,9 +149,9 @@ public class BytehonorHttpClient {
      * @param url
      * @param params
      * @return
-     * @throws BytehonorHttpSdkException
+     * @throws HttpBeautifyException
      */
-    public static String get(String url, Map<String, String> params) throws BytehonorHttpSdkException {
+    public static String get(String url, Map<String, String> params) throws HttpBeautifyException {
         return get(url, params, null);
     }
 
@@ -162,10 +162,10 @@ public class BytehonorHttpClient {
      * @param params
      * @param headers
      * @return
-     * @throws BytehonorHttpSdkException
+     * @throws HttpBeautifyException
      */
     public static String get(String url, Map<String, String> params, Map<String, String> headers)
-            throws BytehonorHttpSdkException {
+            throws HttpBeautifyException {
         Objects.requireNonNull(url, "url");
         if (params != null && params.isEmpty() == false) {
             StringBuilder sb = new StringBuilder(url);
@@ -199,9 +199,9 @@ public class BytehonorHttpClient {
      * @param url
      * @param params
      * @return
-     * @throws BytehonorHttpSdkException
+     * @throws HttpBeautifyException
      */
-    public static String postForm(String url, Map<String, String> params) throws BytehonorHttpSdkException {
+    public static String postForm(String url, Map<String, String> params) throws HttpBeautifyException {
         return postForm(url, params, null);
     }
 
@@ -212,10 +212,10 @@ public class BytehonorHttpClient {
      * @param params
      * @param headers
      * @return
-     * @throws BytehonorHttpSdkException
+     * @throws HttpBeautifyException
      */
     public static String postForm(String url, Map<String, String> params, Map<String, String> headers)
-            throws BytehonorHttpSdkException {
+            throws HttpBeautifyException {
         Objects.requireNonNull(url, "url");
 
         HttpPost request = new HttpPost(url);
@@ -236,7 +236,7 @@ public class BytehonorHttpClient {
             request.setEntity(new UrlEncodedFormEntity(pairs));
         } catch (UnsupportedEncodingException e) {
             LOG.error("postForm error", e);
-            throw new BytehonorHttpSdkException(e);
+            throw new HttpBeautifyException(e);
         }
 
         return execute(request);
@@ -272,7 +272,7 @@ public class BytehonorHttpClient {
             request.setEntity(new StringEntity(json, Charset.forName("UTF-8")));
         } catch (Exception e) {
             LOG.error("postJson error", e);
-            throw new BytehonorHttpSdkException(e);
+            throw new HttpBeautifyException(e);
         }
         return execute(request);
     }
@@ -301,27 +301,27 @@ public class BytehonorHttpClient {
             request.setEntity(new StringEntity(xml, Charset.forName("UTF-8")));
         } catch (Exception e) {
             LOG.error("postJson error", e);
-            throw new BytehonorHttpSdkException(e);
+            throw new HttpBeautifyException(e);
         }
         return execute(request);
     }
 
     public static String uploadMedia(String url, Map<String, String> params, File file)
-            throws BytehonorHttpSdkException {
+            throws HttpBeautifyException {
         return upload(url, params, file, "media");
     }
 
-    public static String uploadPic(String url, Map<String, String> params, File file) throws BytehonorHttpSdkException {
+    public static String uploadPic(String url, Map<String, String> params, File file) throws HttpBeautifyException {
         return upload(url, params, file, "pic");
     }
 
     public static String uploadFile(String url, Map<String, String> params, File file)
-            throws BytehonorHttpSdkException {
+            throws HttpBeautifyException {
         return upload(url, params, file, "file");
     }
 
     public static String upload(String url, Map<String, String> params, File file, String fileKey)
-            throws BytehonorHttpSdkException {
+            throws HttpBeautifyException {
         Objects.requireNonNull(url, "url");
 
         throw new RuntimeException("TODO");
@@ -374,7 +374,7 @@ public class BytehonorHttpClient {
             fileout.close();
         } catch (Exception e) {
             LOG.error("download url:{}", url, e);
-            throw new BytehonorHttpSdkException(e);
+            throw new HttpBeautifyException(e);
         } finally {
             close(null);
         }

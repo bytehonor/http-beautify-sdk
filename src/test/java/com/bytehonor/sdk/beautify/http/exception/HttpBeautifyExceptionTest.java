@@ -1,10 +1,10 @@
-package com.bytehonor.sdk.http.bytehonor.exception;
+package com.bytehonor.sdk.beautify.http.exception;
 
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
-public class BytehonorHttpSdkExceptionTest {
+public class HttpBeautifyExceptionTest {
 
     @Test
     public void testOkhttpBasicSdkException() {
