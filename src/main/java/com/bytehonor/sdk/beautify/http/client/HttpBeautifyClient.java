@@ -44,8 +44,8 @@ public class HttpBeautifyClient {
     /**
      * socket超时时间
      * 
-     * private static final int SOCKET_TIMEOUT = 10 * 1000;
      */
+    private static final int SOCKET_TIMEOUT = 10 * 1000;
 
     /**
      * 连接请求超时时间
@@ -76,8 +76,8 @@ public class HttpBeautifyClient {
     }
 
     public static CloseableHttpClient build() {
-        RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(CONNECTION_REQUEST_TIMEOUT)
-                .setConnectTimeout(CONNECT_TIMEOUT).build();
+        RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(SOCKET_TIMEOUT)
+                .setConnectionRequestTimeout(CONNECTION_REQUEST_TIMEOUT).setConnectTimeout(CONNECT_TIMEOUT).build();
         // https://blog.csdn.net/qq_28929589/article/details/88284723
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
         connectionManager.setMaxTotal(CONNECT_POOL_MAX_TOTAL);
@@ -306,8 +306,7 @@ public class HttpBeautifyClient {
         return execute(request);
     }
 
-    public static String uploadMedia(String url, Map<String, String> params, File file)
-            throws HttpBeautifyException {
+    public static String uploadMedia(String url, Map<String, String> params, File file) throws HttpBeautifyException {
         return upload(url, params, file, "media");
     }
 
@@ -315,8 +314,7 @@ public class HttpBeautifyClient {
         return upload(url, params, file, "pic");
     }
 
-    public static String uploadFile(String url, Map<String, String> params, File file)
-            throws HttpBeautifyException {
+    public static String uploadFile(String url, Map<String, String> params, File file) throws HttpBeautifyException {
         return upload(url, params, file, "file");
     }
 
