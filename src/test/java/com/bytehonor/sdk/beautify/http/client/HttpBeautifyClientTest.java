@@ -16,7 +16,7 @@ public class HttpBeautifyClientTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpBeautifyClientTest.class);
 
-    @Test
+//    @Test
     public void testGetString2() {
         boolean isOk = true;
         try {
@@ -33,13 +33,16 @@ public class HttpBeautifyClientTest {
         assertTrue("*testStartThread*", isOk);
     }
 
-    // @Test
+    @Test
     public void testDownload() {
-        String url = "https://bytehonor-vpn.oss-us-west-1.aliyuncs.com/v1/twitter/1382943097454088192/d6abb9692b553381fd4c0688d5ce99c2.jpg";
-        String path = "/Users/lijianqiang/data/testDownload.jpg";
+        String url = "https://wx4.sinaimg.cn/orj480/9d6d01f9ly1gdmj3ac93vj20u0140u0x.jpg";
+        String path = "/Users/lijianqiang/data/testDownloadWeibo.jpg";
         boolean isOk = true;
         try {
-            HttpBeautifyClient.download(url, path);
+            // Referer: https://m.weibo.cn/detail/4854157586215881
+            Map<String, String> headers = new HashMap<String, String>();
+            headers.put("Referer", "https://m.weibo.cn/detail/4854157586215881");
+            HttpBeautifyClient.download(url, path, headers);
             File file = new File(path);
             isOk = file.exists();
             LOG.info("isOk:{}", isOk);

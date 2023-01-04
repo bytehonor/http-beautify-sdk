@@ -346,11 +346,20 @@ public class HttpBeautifyClient {
     }
 
     public static void download(String url, String filePath) {
+        download(url, filePath, null);
+    }
+
+    public static void download(String url, String filePath, Map<String, String> headers) {
         Objects.requireNonNull(url, "url");
         Objects.requireNonNull(filePath, "filePath");
         try {
             HttpGet request = new HttpGet(url);
             request.setHeader("User-Agent", USER_AGENT);
+            if (headers != null && headers.isEmpty() == false) {
+                for (Entry<String, String> item : headers.entrySet()) {
+                    request.setHeader(item.getKey(), item.getValue());
+                }
+            }
             HttpResponse response = getInstance().httpClient.execute(request);
 
             HttpEntity entity = response.getEntity();
