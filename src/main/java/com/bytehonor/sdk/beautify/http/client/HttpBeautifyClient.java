@@ -31,6 +31,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.bytehonor.sdk.beautify.http.config.HttpConfig;
 import com.bytehonor.sdk.beautify.http.exception.HttpBeautifyException;
 
 /**
@@ -41,73 +42,63 @@ public class HttpBeautifyClient {
 
     private static Logger LOG = LoggerFactory.getLogger(HttpBeautifyClient.class);
 
-    /**
-     * socket超时时间
-     * 
-     */
-    private static final int SOCKET_TIMEOUT = 10 * 1000;
+    private static final String USER_AGENT = "User-Agent";
 
-    /**
-     * 连接请求超时时间
-     */
-    private static final int CONNECTION_REQUEST_TIMEOUT = 10 * 1000;
+    private static final String CONTENT_TYPE = "Content-Type";
 
-    /**
-     * 连接超时时间
-     */
-    private static final int CONNECT_TIMEOUT = 10 * 1000;
+    private static final String ACCEPT = "Accept";
 
-    private static final int CONNECT_POOL_MAX_TOTAL = 1024;
-
-    private static final int CONNECT_POOL_MAX_PER_ROUTE = 1024;
+    private static final String UTF_8 = "UTF-8";
 
     private static final int CACHE = 1024;
-
-    private static final String USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36";
 
     private CloseableHttpClient httpClient;
 
     private HttpBeautifyClient() {
-        this.init();
-    }
-
-    private void init() {
-        httpClient = build();
+        this.httpClient = build();
     }
 
     public static CloseableHttpClient build() {
-        RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(SOCKET_TIMEOUT)
-                .setConnectionRequestTimeout(CONNECTION_REQUEST_TIMEOUT).setConnectTimeout(CONNECT_TIMEOUT).build();
+        RequestConfig config = RequestConfig.custom().setSocketTimeout(HttpConfig.config().getSocketTimeout())
+                .setConnectTimeout(HttpConfig.config().getConnectTimeout())
+                .setConnectionRequestTimeout(HttpConfig.config().getConnectRequestTimeout()).build();
+
         // https://blog.csdn.net/qq_28929589/article/details/88284723
-        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setMaxTotal(CONNECT_POOL_MAX_TOTAL);
-        connectionManager.setDefaultMaxPerRoute(CONNECT_POOL_MAX_PER_ROUTE);
-        connectionManager.setValidateAfterInactivity(1000 * 300);
-        return HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).setConnectionManager(connectionManager)
+        PoolingHttpClientConnectionManager manager = new PoolingHttpClientConnectionManager();
+        manager.setMaxTotal(HttpConfig.config().getConnectPollMaxTotal());
+        manager.setDefaultMaxPerRoute(HttpConfig.config().getConnectPollMaxPerRoute());
+        manager.setValidateAfterInactivity(1000 * 300);
+
+        return HttpClientBuilder.create().setDefaultRequestConfig(config).setConnectionManager(manager)
                 .setConnectionManagerShared(true).build();
     }
 
     private static class LazzyHolder {
-        private static HttpBeautifyClient INSTANCE = new HttpBeautifyClient();
+        private static HttpBeautifyClient SINGLE = new HttpBeautifyClient();
     }
 
-    private static HttpBeautifyClient getInstance() {
-        return LazzyHolder.INSTANCE;
+    private static HttpBeautifyClient self() {
+        return LazzyHolder.SINGLE;
+    }
+
+    private static CloseableHttpClient client() {
+        return self().httpClient;
     }
 
     private static String execute(HttpUriRequest request) {
-        if (getInstance().httpClient == null) {
+        if (client() == null) {
             throw new HttpBeautifyException("httpClient not init");
         }
+
         CloseableHttpResponse response = null;
         String body = "";
         try {
-            response = getInstance().httpClient.execute(request);
+            response = client().execute(request);
             StatusLine statusLine = response.getStatusLine();
             int statusCode = statusLine.getStatusCode();
             if (statusCode == 200) {
                 HttpEntity entity = response.getEntity();
-                body = EntityUtils.toString(entity, "UTF-8");
+                body = EntityUtils.toString(entity, UTF_8);
                 EntityUtils.consume(entity);
             } else {
                 LOG.error("statusCode:{}, reason:{}", statusCode, statusLine.getReasonPhrase());
@@ -183,7 +174,7 @@ public class HttpBeautifyClient {
         }
 
         HttpGet request = new HttpGet(url);
-        request.setHeader("User-Agent", USER_AGENT);
+        request.setHeader(USER_AGENT, HttpConfig.config().getUserAgent());
         if (headers != null && headers.isEmpty() == false) {
             for (Entry<String, String> item : headers.entrySet()) {
                 request.setHeader(item.getKey(), item.getValue());
@@ -219,7 +210,7 @@ public class HttpBeautifyClient {
         Objects.requireNonNull(url, "url");
 
         HttpPost request = new HttpPost(url);
-        request.setHeader("User-Agent", USER_AGENT);
+        request.setHeader(USER_AGENT, HttpConfig.config().getUserAgent());
         if (headers != null && headers.isEmpty() == false) {
             for (Entry<String, String> item : headers.entrySet()) {
                 request.setHeader(item.getKey(), item.getValue());
@@ -259,9 +250,9 @@ public class HttpBeautifyClient {
         Objects.requireNonNull(json, "json");
 
         HttpPost request = new HttpPost(url);
-        request.setHeader("User-Agent", USER_AGENT);
-        request.setHeader("Accept", "application/json");
-        request.setHeader("Content-type", "application/json; charset=utf-8");
+        request.setHeader(USER_AGENT, HttpConfig.config().getUserAgent());
+        request.setHeader(ACCEPT, "application/json");
+        request.setHeader(CONTENT_TYPE, "application/json; charset=utf-8");
         if (headers != null && headers.isEmpty() == false) {
             for (Entry<String, String> item : headers.entrySet()) {
                 request.setHeader(item.getKey(), item.getValue());
@@ -269,7 +260,7 @@ public class HttpBeautifyClient {
         }
 
         try {
-            request.setEntity(new StringEntity(json, Charset.forName("UTF-8")));
+            request.setEntity(new StringEntity(json, Charset.forName(UTF_8)));
         } catch (Exception e) {
             LOG.error("postJson error", e);
             throw new HttpBeautifyException(e);
@@ -289,8 +280,8 @@ public class HttpBeautifyClient {
         Objects.requireNonNull(xml, "xml");
 
         HttpPost request = new HttpPost(url);
-        request.setHeader("User-Agent", USER_AGENT);
-        request.setHeader("Content-Type", "application/xml; charset=utf-8");
+        request.setHeader(USER_AGENT, HttpConfig.config().getUserAgent());
+        request.setHeader(CONTENT_TYPE, "application/xml; charset=utf-8");
         if (headers != null && headers.isEmpty() == false) {
             for (Entry<String, String> item : headers.entrySet()) {
                 request.setHeader(item.getKey(), item.getValue());
@@ -298,7 +289,7 @@ public class HttpBeautifyClient {
         }
 
         try {
-            request.setEntity(new StringEntity(xml, Charset.forName("UTF-8")));
+            request.setEntity(new StringEntity(xml, Charset.forName(UTF_8)));
         } catch (Exception e) {
             LOG.error("postJson error", e);
             throw new HttpBeautifyException(e);
@@ -354,13 +345,13 @@ public class HttpBeautifyClient {
         Objects.requireNonNull(filePath, "filePath");
         try {
             HttpGet request = new HttpGet(url);
-            request.setHeader("User-Agent", USER_AGENT);
+            request.setHeader(USER_AGENT, HttpConfig.config().getUserAgent());
             if (headers != null && headers.isEmpty() == false) {
                 for (Entry<String, String> item : headers.entrySet()) {
                     request.setHeader(item.getKey(), item.getValue());
                 }
             }
-            HttpResponse response = getInstance().httpClient.execute(request);
+            HttpResponse response = client().execute(request);
 
             HttpEntity entity = response.getEntity();
             InputStream is = entity.getContent();
