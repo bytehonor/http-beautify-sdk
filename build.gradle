@@ -4,10 +4,14 @@ plugins {
 }
 
 group = 'com.bytehonor.sdk'
-version = '1.2.4'
-sourceCompatibility = 1.8
+version = '1.2.5'
 
 [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+
+java {
+    sourceCompatibility = 1.8
+    withSourcesJar()
+}
 
 configurations {
     developmentOnly
@@ -19,7 +23,6 @@ configurations {
 repositories {
     mavenCentral()
 }
-
 
 dependencies {
     api("org.apache.httpcomponents:httpclient:4.5.14")
@@ -35,10 +38,6 @@ jar {
         attributes('Implementation-Title': project.name,
                    'Implementation-Version': project.version)
     }
-}
-
-java {
-    withSourcesJar()
 }
 
 publishing {
