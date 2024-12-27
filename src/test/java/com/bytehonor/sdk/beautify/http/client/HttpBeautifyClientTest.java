@@ -16,14 +16,14 @@ public class HttpBeautifyClientTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpBeautifyClientTest.class);
 
-//    @Test
+    @Test
     public void testGetString2() {
         boolean isOk = true;
         try {
             // 测测header是否是浏览器的
             Map<String, String> headers = new HashMap<String, String>();
             headers.put("User-Agent", "Second");
-            String html = HttpBeautifyClient.get("https://www.bytehonor.com", null, headers);
+            String html = HttpBeautifyClient.get("https://vue.bytehonor.com", null, headers);
             LOG.info("html:{}", html);
         } catch (HttpBeautifyException e) {
             LOG.error("xxxx", e);
@@ -33,7 +33,7 @@ public class HttpBeautifyClientTest {
         assertTrue("*testStartThread*", isOk);
     }
 
-    @Test
+//    @Test
     public void testDownload() {
         String url = "https://wx4.sinaimg.cn/orj480/9d6d01f9ly1gdmj3ac93vj20u0140u0x.jpg";
         String path = "/Users/lijianqiang/data/testDownloadWeibo.jpg";

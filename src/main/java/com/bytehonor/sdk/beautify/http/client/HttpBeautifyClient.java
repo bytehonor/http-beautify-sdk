@@ -52,24 +52,28 @@ public class HttpBeautifyClient {
 
     private static final int CACHE = 1024;
 
-    private CloseableHttpClient httpClient;
+    private final CloseableHttpClient client;
 
     private HttpBeautifyClient() {
-        this.httpClient = build();
+        this.client = build();
     }
 
     public static CloseableHttpClient build() {
-        RequestConfig config = RequestConfig.custom().setSocketTimeout(HttpConfig.config().getSocketTimeout())
-                .setConnectTimeout(HttpConfig.config().getConnectTimeout())
-                .setConnectionRequestTimeout(HttpConfig.config().getConnectRequestTimeout()).build();
+        return build(HttpConfig.config());
+    }
+
+    public static CloseableHttpClient build(HttpConfig httpConfig) {
+        RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(httpConfig.getSocketTimeout())
+                .setConnectTimeout(httpConfig.getConnectTimeout())
+                .setConnectionRequestTimeout(httpConfig.getConnectRequestTimeout()).build();
 
         // https://blog.csdn.net/qq_28929589/article/details/88284723
         PoolingHttpClientConnectionManager manager = new PoolingHttpClientConnectionManager();
-        manager.setMaxTotal(HttpConfig.config().getConnectPollMaxTotal());
-        manager.setDefaultMaxPerRoute(HttpConfig.config().getConnectPollMaxPerRoute());
+        manager.setMaxTotal(httpConfig.getConnectPollMaxTotal());
+        manager.setDefaultMaxPerRoute(httpConfig.getConnectPollMaxPerRoute());
         manager.setValidateAfterInactivity(1000 * 300);
 
-        return HttpClientBuilder.create().setDefaultRequestConfig(config).setConnectionManager(manager)
+        return HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).setConnectionManager(manager)
                 .setConnectionManagerShared(true).build();
     }
 
@@ -81,19 +85,15 @@ public class HttpBeautifyClient {
         return LazzyHolder.SINGLE;
     }
 
-    private static CloseableHttpClient client() {
-        return self().httpClient;
-    }
-
-    private static String execute(HttpUriRequest request) {
-        if (client() == null) {
+    private String execute(HttpUriRequest request) {
+        if (client == null) {
             throw new HttpBeautifyException("httpClient not init");
         }
 
         CloseableHttpResponse response = null;
         String body = "";
         try {
-            response = client().execute(request);
+            response = client.execute(request);
             StatusLine statusLine = response.getStatusLine();
             int statusCode = statusLine.getStatusCode();
             if (statusCode == 200) {
@@ -181,7 +181,7 @@ public class HttpBeautifyClient {
             }
         }
 
-        return execute(request);
+        return self().execute(request);
     }
 
     /**
@@ -230,7 +230,7 @@ public class HttpBeautifyClient {
             throw new HttpBeautifyException(e);
         }
 
-        return execute(request);
+        return self().execute(request);
     }
 
     /**
@@ -265,7 +265,7 @@ public class HttpBeautifyClient {
             LOG.error("postJson error", e);
             throw new HttpBeautifyException(e);
         }
-        return execute(request);
+        return self().execute(request);
     }
 
     public static String postXml(String url, String xml) {
@@ -294,7 +294,7 @@ public class HttpBeautifyClient {
             LOG.error("postJson error", e);
             throw new HttpBeautifyException(e);
         }
-        return execute(request);
+        return self().execute(request);
     }
 
     public static String uploadMedia(String url, Map<String, String> params, File file) throws HttpBeautifyException {
@@ -351,7 +351,7 @@ public class HttpBeautifyClient {
                     request.setHeader(item.getKey(), item.getValue());
                 }
             }
-            HttpResponse response = client().execute(request);
+            HttpResponse response = self().client.execute(request);
 
             HttpEntity entity = response.getEntity();
             InputStream is = entity.getContent();

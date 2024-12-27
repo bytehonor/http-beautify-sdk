@@ -14,17 +14,17 @@ public class HttpConfig {
      * socket超时时间
      * 
      */
-    private static final int SOCKET_TIMEOUT = 10 * 1000;
+    private static final int SOCKET_TIMEOUT = 5 * 1000;
 
     /**
      * 连接超时时间
      */
-    private static final int CONNECT_TIMEOUT = 10 * 1000;
+    private static final int CONNECT_TIMEOUT = 5 * 1000;
 
     /**
      * 连接请求超时时间
      */
-    private static final int CONNECT_REQUEST_TIMEOUT = 10 * 1000;
+    private static final int CONNECT_REQUEST_TIMEOUT = 5 * 1000;
 
     private String userAgent;
 
