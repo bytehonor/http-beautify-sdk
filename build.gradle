@@ -20,7 +20,7 @@ dependencies {
     api("org.apache.httpcomponents:httpmime:4.5.14")
     api("org.apache.httpcomponents:httpcore:4.4.16")
     implementation('org.slf4j:slf4j-api:2.0.16')
-    implementation('ch.qos.logback:logback-classic:1.5.12')
+    implementation('ch.qos.logback:logback-classic:1.5.16')
     testImplementation('junit:junit:4.13.2')
 }
 
